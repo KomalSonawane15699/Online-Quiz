@@ -1,6 +1,5 @@
 import React from 'react';
 
-// Receives a navigation function as a prop to handle button clicks
 function Header({ onNavigate }) {
   return (
     <header className="landing-header">
@@ -11,8 +10,11 @@ function Header({ onNavigate }) {
         <a href="#rewards">Rewards</a>
         <a href="#about">About</a>
       </nav>
-      {/* Button uses the onNavigate prop to switch to the signup page */}
-      <button className="nav-button" onClick={() => onNavigate('signup')}>Sign Up</button>
+      {/* Buttons navigate to the modal views on the top right */}
+      <div>
+        <button className="nav-button btn-secondary" onClick={() => onNavigate('login')}>Sign In</button>
+        <button className="nav-button btn-primary" onClick={() => onNavigate('signup')}>Register</button>
+      </div>
     </header>
   );
 }

@@ -1,20 +1,31 @@
 import React, { useState } from 'react';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
-import SignupPage from './pages/SignupPage'; // Corrected capitalization
-import './App.css';
+import SignupPage from './pages/SignUpPage';
+import './App.css'; 
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('landing'); // 'landing', 'login', 'signup'
-
+  const [currentPage, setCurrentPage] = useState('landing'); 
   const navigate = (page) => setCurrentPage(page);
 
   const renderPage = () => {
     switch (currentPage) {
       case 'login':
-        return <LoginPage onSignupClick={() => navigate('signup')} />;
+        // Renders Login Page as a modal over the Landing page content
+        return (
+            <>
+                <LandingPage onNavigate={navigate} />
+                <LoginPage onSignupClick={() => navigate('signup')} onNavigate={navigate} />
+            </>
+        );
       case 'signup':
-        return <SignupPage onLoginClick={() => navigate('login')} />;
+        // Renders Signup Page as a modal over the Landing page content
+        return (
+            <>
+                <LandingPage onNavigate={navigate} />
+                <SignupPage onLoginClick={() => navigate('login')} onNavigate={navigate} />
+            </>
+        );
       case 'landing':
       default:
         return <LandingPage onNavigate={navigate} />;
