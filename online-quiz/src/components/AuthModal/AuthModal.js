@@ -1,4 +1,5 @@
 import React from 'react';
+import './AuthModal.css';
 
 function AuthModal({ children, title, onNavigate }) {
   // Function to close the modal by navigating back to the landing page

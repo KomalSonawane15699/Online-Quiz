@@ -1,7 +1,8 @@
 import React from 'react';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import Card from '../components/Card'; 
+import Header from '../../components/Header/Header';
+import Footer from '../../components/Footer/Footer';
+import Card from '../../components/Card/Card'; 
+import './LandingPage.css';
 
 // Data for sections (No changes here from previous step)
 const quizCategories = [

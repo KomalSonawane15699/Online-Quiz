@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import LandingPage from './pages/LandingPage';
-import LoginPage from './pages/LoginPage';
-import SignupPage from './pages/SignUpPage';
+import LandingPage from './pages/landingPage/LandingPage';
+import LoginPage from './pages/loginPage/LoginPage';
+import SignupPage from './pages/signupPage/SignupPage';
 import './App.css'; 
 
 function App() {
