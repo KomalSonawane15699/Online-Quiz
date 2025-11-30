@@ -1,0 +1,53 @@
+/* --- 6. Footer Styles --- */
+.landing-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 60px 80px;
+    background-color: var(--color-dark-bg);
+    border-top: 1px solid #2e1a47;
+}
+.footer-col {
+    max-width: 250px;
+}
+.footer-col .logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--color-purple);
+    margin-bottom: 15px;
+    display: block;
+}
+.footer-col p, .footer-col li {
+    font-size: 14px;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+}
+.footer-col h4 {
+    font-size: 16px;
+    color: var(--color-text-light);
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+.footer-col ul {
+    list-style: none;
+}
+.social-links a {
+    font-size: 20px;
+    margin-right: 15px;
+}
+
+
+
+
+
+/* Footer Terms */
+.modal-footer-terms {
+    font-size: 11px;
+    color: #999;
+    text-align: center;
+    margin-top: 20px;
+    line-height: 1.4;
+}
+.modal-footer-terms a {
+    color: var(--color-primary);
+    text-decoration: none;
+}
