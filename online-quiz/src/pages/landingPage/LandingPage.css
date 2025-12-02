@@ -1,32 +1,7 @@
-/* --- 1. Header Styles --- */
-.landing-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 80px;
-    position: fixed; 
-    width: 100%;
-    z-index: 100;
-    background-color: rgba(13, 0, 20, 0.95); 
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-.landing-header .logo {
-    font-size: 24px;
-    font-weight: 800;
-    color: var(--color-purple);
-}
-.landing-header nav a {
-    margin-right: 25px;
-    font-size: 16px;
-    color: var(--color-text-muted);
-    transition: color 0.2s;
-}
-.landing-header nav a:hover {
-    color: var(--color-text-light);
-}
-.landing-header .nav-button {
-    margin-left: 10px;
-}
+/* src/pages/landingPage/LandingPage.css */
+
+/* --- 1. Header Styles (Header Component CSS also uses these classes) --- */
+/* NOTE: The actual implementation of these styles for the header element is in Header.css */
 
 /* --- 2. Hero Section --- */
 .hero-section {
@@ -168,50 +143,6 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
-}
-
-/* Card Styles */
-.card-container {
-    background-color: var(--color-card-bg);
-    padding: 25px;
-    border-radius: 12px;
-    text-align: left;
-    border: 1px solid #2e1a47;
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-.card-container:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5), 0 0 15px var(--color-purple);
-}
-.category-card .card-icon {
-    font-size: 28px;
-    display: block;
-    margin-bottom: 15px;
-    color: var(--color-purple-light);
-}
-.card-title {
-    font-size: 18px;
-    margin-bottom: 5px;
-    color: var(--color-text-light);
-
-}
-.card-description {
-    color: var(--color-text-muted);
-    font-size: 14px;
-    margin: 0 0 10px 0;
-}
-.card-link {
-    color: var(--color-purple);
-    font-weight: bold;
-    display: inline-block;
-    margin-top: 10px;
-}
-.feature-card {
-    border: none;
-    background-color: #11111a;
-}
-.feature-card .card-title {
-    color: var(--color-primary);
 }
 
 

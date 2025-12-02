@@ -1,28 +1,25 @@
+// src/components/Card/Card.js
+
 import React from 'react';
-// Note: Styling for '.card-container' and its contents is in App.css
 
-function Card({ icon, title, description, linkText, type = 'category' }) {
-  // Determine if it's a feature card (simpler layout) or category card
-  const isFeature = type === 'feature';
+// Card Styles are defined in LandingPage.css, but for completeness, 
+// let's define a minimal, reusable card component.
+// The necessary styles are included in LandingPage.css
 
-  return (
-    <div className={`card-container ${isFeature ? 'feature-card' : 'category-card'}`}>
-      {!isFeature && (
-        <span className="card-icon">{icon}</span>
-      )}
-      
-      {/* For Categories, title is often the main subject, for Features, it's the feature name */}
-      <h3 className="card-title">{title}</h3>
-      
-      {/* Description */}
-      <p className="card-description">{description}</p>
-      
-      {/* Link only for Category cards */}
-      {!isFeature && linkText && (
-        <a href="#" className="card-link">{linkText} →</a>
-      )}
-    </div>
-  );
-}
+const Card = ({ icon, title, description, onClick, isCategory, isFeature }) => {
+    // Determine the class based on card type
+    let cardClass = 'card-container';
+    if (isCategory) cardClass += ' category-card';
+    if (isFeature) cardClass += ' feature-card';
+
+    return (
+        <div className={cardClass} onClick={onClick}>
+            <span className="card-icon">{icon}</span>
+            <h3 className="card-title">{title}</h3>
+            <p className="card-description">{description}</p>
+            {isCategory && <div className="card-link">Explore Quizzes →</div>}
+        </div>
+    );
+};
 
 export default Card;

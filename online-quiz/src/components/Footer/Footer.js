@@ -1,46 +1,40 @@
+// src/components/Footer/Footer.js
+
 import React from 'react';
-import './Footer.css';
+// Correct path: CSS is in the same folder
+import './Footer.css'; 
 
 function Footer() {
+  // Fix for jsx-a11y/anchor-is-valid warning
+  const preventDefault = (e) => e.preventDefault();
+
   return (
     <footer className="landing-footer">
-      <div className="footer-col logo-col">
-        <div className="logo">Quizzy</div>
+      <div className="footer-col">
+        <div className="logo-quizzy">Quizzy</div>
         <p>The ultimate quiz platform for students and teachers. Join today!</p>
-        {/* Social Icons Placeholder */}
         <div className="social-links">
-            {/* Replace with actual social icons */}
-            <a href="#">📘</a>
-            <a href="#">📸</a>
-            <a href="#">🐦</a>
-            <a href="#">👔</a>
+          {/* FIX: Using role="button" and onClick to resolve a11y warning */}
+          <a href="#" role="button" onClick={preventDefault} aria-label="Facebook"><i className="fab fa-facebook-f"></i></a>
+          <a href="#" role="button" onClick={preventDefault} aria-label="Twitter"><i className="fab fa-twitter"></i></a>
+          <a href="#" role="button" onClick={preventDefault} aria-label="Instagram"><i className="fab fa-instagram"></i></a>
         </div>
       </div>
       <div className="footer-col">
-        <h4>Quick Links</h4>
+        <h4>Product</h4>
         <ul>
-          <li>Home</li>
-          <li>About Us</li>
-          <li>Features</li>
-          <li>Pricing</li>
-          <li>Contact</li>
+          <li><a href="#">Quizzes</a></li>
+          <li><a href="#">Events</a></li>
+          <li><a href="#">Pricing</a></li>
         </ul>
       </div>
       <div className="footer-col">
-        <h4>For Teachers</h4>
+        <h4>Company</h4>
         <ul>
-          <li>Resources</li>
-          <li>Contact Us</li>
-          <li>Careers</li>
-          <li>Terms</li>
-          <li>Blog</li>
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Contact</a></li>
         </ul>
-      </div>
-      <div className="footer-col">
-        <h4>Contacts us</h4>
-        <p>✉️ hello@company.com</p>
-        <p>📞 414-221-5098</p>
-        <p>📍 794 Mcallister St, San Francisco, 94102</p>
       </div>
     </footer>
   );
