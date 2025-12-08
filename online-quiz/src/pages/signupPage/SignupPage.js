@@ -3,6 +3,10 @@ import AuthModal from '../../components/AuthModal/AuthModal';
 import './SignUpPage.css';
 
 function SignupPage({ onLoginClick, onNavigate }) {
+  const handleSignup =(e)=>{
+    e.preventDefault();
+    onNavigate("dashboard");
+  }
   // The Signup page will use the AuthModal wrapper for centering
   return (
     <AuthModal 
@@ -26,7 +30,7 @@ function SignupPage({ onLoginClick, onNavigate }) {
             </button>
           </div>
 
-          <form className="form">
+          <form className="form" onSubmit={handleSignup}>
             <div className="row">
               <input placeholder="Full Name" />
               <input placeholder="Username" />

@@ -3,6 +3,10 @@ import AuthModal from "../../components/AuthModal/AuthModal";
 import "./LoginPage.css";
 
 function LoginPage({ onSignupClick, onNavigate }) {
+  const handleLogin=(e)=>{
+    e.preventDefault();
+    onNavigate("dashboard")
+  };
   return (
     <AuthModal title="Sign in" onNavigate={onNavigate}>
       <div className="card">
@@ -10,7 +14,7 @@ function LoginPage({ onSignupClick, onNavigate }) {
         <p className="subtitle">
           Enter your credentials to access your account
         </p>
-<form className="auth-form-modal">
+<form className="auth-form-modal" onSubmit={handleLogin}>
   <div className="input-group">
     <input type="email" id="email" placeholder="Email" required />
   </div>

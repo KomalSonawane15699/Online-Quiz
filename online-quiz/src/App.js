@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import LandingPage from './pages/landingPage/LandingPage';
 import LoginPage from './pages/loginPage/LoginPage';
 import SignupPage from './pages/signupPage/SignupPage';
+import Dashboard from './pages/dashBoard/Dashboard';
 import './App.css'; 
 
 function App() {
@@ -26,6 +27,9 @@ function App() {
                 <SignupPage onLoginClick={() => navigate('login')} onNavigate={navigate} />
             </>
         );
+         case "dashboard":
+        return <Dashboard onNavigate={navigate} />;
+
       case 'landing':
       default:
         return <LandingPage onNavigate={navigate} />;
