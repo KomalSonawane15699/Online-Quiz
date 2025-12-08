@@ -10,15 +10,15 @@ const statCards = [
 ];
 
 const events = [
-  { title: "Science Mid-term Quiz", meta: "Today, 2:30 PM • 32 participants", primary: true },
-  { title: "Mathematics Weekly Test", meta: "Tomorrow, 10:00 AM • 28 participants" },
-  { title: "History Final Exam", meta: "May 20, 9:00 AM • 45 participants" },
+  { title: " Mid-term Quiz", meta: "Today, 2:30 PM • 32 participants", primary: true },
+  { title: " Weekly Test", meta: "Tomorrow, 10:00 AM • 28 participants" },
+  { title: " Final Exam", meta: "May 20, 9:00 AM • 45 participants" },
 ];
 
 const quizzes = [
-  { title: "Introduction to Biology", questions: 15, completions: 28, completionRate: 75 },
-  { title: "Introduction to Biology", questions: 15, completions: 28, completionRate: 40 },
-  { title: "Introduction to Biology", questions: 15, completions: 28, completionRate: 90 },
+  { title: "Introduction to ", questions: 15, completions: 28, completionRate: 75 },
+  { title: "Introduction to ", questions: 15, completions: 28, completionRate: 40 },
+  { title: "Introduction to ", questions: 15, completions: 28, completionRate: 90 },
 ];
 
 const topStudents = [
