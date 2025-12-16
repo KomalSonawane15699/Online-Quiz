@@ -1,102 +1,157 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import "./Dashboard.css";
 
+
+const statCards = [
+  { label: "Total Quizzes", value: "2,543", change: "+12.5%", trend: "up" },
+  { label: "Active Events", value: "2,543", change: "+12.5%", trend: "up" },
+  { label: "Students", value: "2,543", change: "+12.5%", trend: "up" },
+  { label: "Avg. Completion", value: "2,543", change: "-12.5%", trend: "down" },
+];
+
+const events = [
+  { title: " Mid-term Quiz", meta: "Today, 2:30 PM • 32 participants", primary: true },
+  { title: " Weekly Test", meta: "Tomorrow, 10:00 AM • 28 participants" },
+  { title: " Final Exam", meta: "May 20, 9:00 AM • 45 participants" },
+];
+
+const quizzes = [
+  { title: "Introduction to ", questions: 15, completions: 28, completionRate: 75 },
+  { title: "Introduction to ", questions: 15, completions: 28, completionRate: 40 },
+  { title: "Introduction to ", questions: 15, completions: 28, completionRate: 90 },
+];
+
+const topStudents = [
+  { name: "Alex John", subject: "Science", score: 950 },
+  { name: "Emma Watson", subject: "Mathematics", score: 920 },
+  { name: "Michael Clark", subject: "Physics", score: 880 },
+  { name: "Sophia Green", subject: "English", score: 890 },
+  { name: "Lucia Wilde", subject: "Science", score: 870 },
+];
+
 function Dashboard() {
-  const [statCards, setStatCards] = useState([]);
-  const [events, setEvents] = useState([]);
-  const [quizzes, setQuizzes] = useState([]);
-  const [topStudents, setTopStudents] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    fetchDashboardData();
-  }, []); // Empty dependency array ensures it runs once on mount
-
-  const fetchDashboardData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      // Fetch all data in parallel for better performance
-      const [statsRes, eventsRes, quizzesRes, studentsRes] = await Promise.all([
-        fetch('/api/dashboard/stats'),
-        fetch('/api/dashboard/events'),
-        fetch('/api/dashboard/quizzes'),
-        fetch('/api/dashboard/top-students')
-      ]);
-
-      const stats = await statsRes.json();
-      const eventsData = await eventsRes.json();
-      const quizzesData = await quizzesRes.json();
-      const students = await studentsRes.json();
-
-      setStatCards(stats);
-      setEvents(eventsData);
-      setQuizzes(quizzesData);
-      setTopStudents(students);
-    } catch (err) {
-      setError('Failed to load dashboard data');
-      console.error('Dashboard fetch error:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Add refresh button functionality
-  const handleRefresh = () => {
-    fetchDashboardData();
-  };
-
-  if (loading) {
-    return (
-      <div className="dashboard-root">
-        <div className="dashboard-shell">
-          <main className="dashboard-layout">
-            <div style={{ padding: '2rem', textAlign: 'center' }}>
-              Loading your dashboard...
-            </div>
-          </main>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="dashboard-root">
-        <div className="dashboard-shell">
-          <main className="dashboard-layout">
-            <div style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>
-              {error}
-              <br />
-              <button onClick={handleRefresh} className="btn btn-primary" style={{ marginTop: '1rem' }}>
-                Try Again
-              </button>
-            </div>
-          </main>
-        </div>
-      </div>
-    );
-  }
-
-  // Rest of your JSX remains the same, just replace data arrays with state
   return (
     <div className="dashboard-root">
-      {/* Your existing JSX with statCards, events, quizzes, topStudents state */}
-      {/* Add refresh button in header */}
-      <header className="dashboard-topbar">
-        <div className="dashboard-search-wrapper">
-          <input type="text" placeholder="Search..." className="dashboard-search-input" />
-        </div>
-        <div>
-          <button onClick={handleRefresh} className="btn btn-outline" style={{ marginRight: '0.5rem' }}>
-            Refresh
-          </button>
+      <div className="dashboard-shell">
+        
+        <header className="dashboard-topbar">
+          <div className="dashboard-search-wrapper">
+            <input
+              type="text"
+              placeholder="Search..."
+              className="dashboard-search-input"
+            />
+          </div>
           <button className="btn btn-primary">+ Create New Quiz</button>
-        </div>
-      </header>
-      {/* ... rest of component */}
+        </header>
+
+        
+        <main className="dashboard-layout">
+          
+          <section className="dashboard-main">
+            <header className="dashboard-header">
+              <h1>Dashboard</h1>
+              <p>Welcome back! Here's what's happening with your quizzes.</p>
+            </header>
+
+            
+            <section className="stats-grid">
+              {statCards.map((card) => (
+                <article key={card.label} className="stat-card">
+                  <p className="stat-label">{card.label}</p>
+                  <h2 className="stat-value">{card.value}</h2>
+                  <p
+                    className={`stat-change ${
+                      card.trend === "up" ? "up" : "down"
+                    }`}
+                  >
+                    {card.change}
+                  </p>
+                </article>
+              ))}
+            </section>
+
+            <section className="panel">
+              <header className="panel-header">
+                <h2>Recent Events</h2>
+              </header>
+              <div className="events-list">
+                {events.map((event) => (
+                  <article key={event.title} className="event-card">
+                    <div className="event-info">
+                      <h3>{event.title}</h3>
+                      <p>{event.meta}</p>
+                    </div>
+                    {event.primary ? (
+                      <button className="btn btn-accent">View Live</button>
+                    ) : (
+                      <button className="btn btn-outline">Manage</button>
+                    )}
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            <section className="panel">
+              <header className="panel-header">
+                <h2>Recent Quizzes</h2>
+              </header>
+              <div className="quiz-grid">
+                {quizzes.map((quiz, idx) => (
+                  <article key={idx} className="quiz-card">
+                    <div className="quiz-header">
+                      <h3>{quiz.title}</h3>
+                      <span className="quiz-arrow">›</span>
+                    </div>
+                    <p className="quiz-meta">
+                      {quiz.questions} questions • {quiz.completions} completions
+                    </p>
+                    <div className="progress-row">
+                      <span>Completion Rate</span>
+                      <span>{quiz.completionRate}%</span>
+                    </div>
+                    <div className="progress-bar">
+                      <div
+                        className="progress-fill"
+                        style={{ width: `${quiz.completionRate}%` }}
+                      />
+                    </div>
+                  </article>
+                ))}
+
+                <article className="quiz-card quiz-create">
+                  <button className="btn-circle">+</button>
+                  <p>Create New Quiz</p>
+                </article>
+              </div>
+            </section>
+          </section>
+
+         
+          <aside className="dashboard-sidebar">
+            <section className="panel">
+              <header className="panel-header">
+                <h2>Top Students</h2>
+                <p className="panel-subtitle">
+                  Students with highest quiz scores
+                </p>
+              </header>
+              <ol className="student-list">
+                {topStudents.map((student, index) => (
+                  <li key={student.name} className="student-item">
+                    <span className="student-rank">{index + 1}</span>
+                    <div className="student-info">
+                      <p className="student-name">{student.name}</p>
+                      <p className="student-subject">{student.subject}</p>
+                    </div>
+                    <span className="student-score">{student.score}</span>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          </aside>
+        </main>
+      </div>
     </div>
   );
 }
