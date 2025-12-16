@@ -3,6 +3,7 @@ import LandingPage from './pages/landingPage/LandingPage';
 import LoginPage from './pages/loginPage/LoginPage';
 import SignupPage from './pages/signupPage/SignupPage';
 import Dashboard from './pages/dashBoard/Dashboard';
+import QuizzesPage from './pages/Quizzess/Quizzess';
 import './App.css'; 
 
 function App() {
@@ -29,6 +30,9 @@ function App() {
         );
          case "dashboard":
         return <Dashboard onNavigate={navigate} />;
+
+        case "Quizzess":
+        return <QuizzesPage onNavigate={navigate}/>;
 
       case 'landing':
       default:
