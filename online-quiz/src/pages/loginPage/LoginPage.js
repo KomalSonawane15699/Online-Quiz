@@ -1,8 +1,16 @@
 import React from "react";
 import AuthModal from "../../components/AuthModal/AuthModal";
 import "./LoginPage.css";
+import { useNavigate } from 'react-router-dom';
+
 
 function LoginPage({ onSignupClick, onNavigate }) {
+    const navigate = useNavigate();
+
+  const handleLogin=(e)=>{
+    e.preventDefault();
+    navigate('/dashboard'); // Navigates to the Dashboard page
+  };
   return (
     <AuthModal title="Sign in" onNavigate={onNavigate}>
       <div className="card">
@@ -10,7 +18,7 @@ function LoginPage({ onSignupClick, onNavigate }) {
         <p className="subtitle">
           Enter your credentials to access your account
         </p>
-<form className="auth-form-modal">
+<form className="auth-form-modal" onSubmit={handleLogin}>
   <div className="input-group">
     <input type="email" id="email" placeholder="Email" required />
   </div>
