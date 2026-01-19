@@ -1,6 +1,15 @@
-
 /* Input Fields */
 .auth-form-modal input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.auth-form-modal select {
     width: 100%;
     padding: 12px;
     border: 1px solid #ccc;
@@ -77,4 +86,16 @@
   margin: 0 0 18px;
   color: #6b7280;
   font-size: 14px;
+}
+
+.btn-disabled,
+.btn-primary:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  pointer-events: none;
+}
+.error-message {
+  color: red;
+  margin-top: 10px;
+  text-align: center;
 }
