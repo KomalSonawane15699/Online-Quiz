@@ -1,7 +1,7 @@
 // src/pages/landingPage/LandingPage.js
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 // Correct path: Up two levels to src/components/
 import Header from '../../components/Header/Header'; 
 import Footer from '../../components/Footer/Footer'; 
@@ -13,6 +13,17 @@ import './LandingPage.css';
 
 function LandingPage() {
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // Scroll to section if hash is present in URL
+    React.useEffect(() => {
+        if (location.hash) {
+            const el = document.getElementById(location.hash.replace('#', ''));
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    }, [location.hash]);
 
     const handleCategoryClick = (categoryId) => {
         // Navigates to the SubSubjects page, e.g., /category/science
@@ -35,7 +46,7 @@ function LandingPage() {
             <Header />
 
             {/* Hero Section */}
-            <section className="hero-section">
+            <section className="hero-section" id="home">
                 <div className="hero-content">
                     <p className="subtitle">THE NEXT GENERATION LEARNING</p>
                     <h1>Master Any Subject with Interactive Quizzes</h1>
@@ -49,7 +60,7 @@ function LandingPage() {
             </section>
 
             {/* Streaks Section (Mock Data) */}
-            <section className="streaks-section">
+            <section className="streaks-section" id="streaks">
                 <div className="streak-count-display">
                     <span className="current-streak-fire">🔥</span>
                     <span className="streak-number">3 Day Streak</span>
@@ -66,7 +77,7 @@ function LandingPage() {
             </section>
 
             {/* Categories Section */}
-            <section className="categories-section">
+            <section className="categories-section" id="subjects">
                 <h2>Browse Subjects</h2>
                 <p>Pick a subject area and dive into thousands of expertly crafted quizzes.</p>
                 <div className="categories-grid">
@@ -84,7 +95,7 @@ function LandingPage() {
             </section>
 
             {/* Why Quizzy Section (Features) */}
-            <section className="why-quizzy-section">
+            <section className="why-quizzy-section" id="features">
                 <h2>Why Choose Quizzy?</h2>
                 <p>Smart tools to make learning effective, fun, and personalized.</p>
                 <div className="features-grid">
@@ -110,7 +121,7 @@ function LandingPage() {
             </section>
 
             {/* Ready to Start Section */}
-            <section className="ready-start-section">
+            <section className="ready-start-section" id="contact">
                 <div className="start-content">
                     <h2>Ready to supercharge your study?</h2>
                     <p>Start your free trial today and experience the difference smarter learning makes.</p>

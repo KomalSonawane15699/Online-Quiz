@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './Header.css';
 import SignupPage from '../../pages/signupPage/SignupPage';
 import LoginPage from '../../pages/loginPage/LoginPage';
+import { Link } from 'react-router-dom';
 
 function Header({ onSignupClick, onLoginClick }) {
   const [showSignupModal, setShowSignupModal] = useState(false);
@@ -26,10 +27,16 @@ function Header({ onSignupClick, onLoginClick }) {
     <header className="landing-header">
       <div className="logo">Quizzy</div>
       <nav>
-        <a href="#home">Home</a>
-        <a href="#subjects">Subjects</a>
-        <a href="#features">Features</a>
-        <a href="#contact">Contact</a>
+        {/* 
+          These <Link to="/#section"> links will navigate to the landing page ("/") 
+          and set the hash in the URL (e.g., "/#subjects"). 
+          On the landing page, you should have elements with matching IDs (e.g., id="subjects").
+          When the hash changes, the browser will scroll to the element with that ID.
+        */}
+        <Link to="/#home">Home</Link>
+        <Link to="/#subjects">Subjects</Link>
+        <Link to="/#features">Features</Link>
+        <Link to="/#contact">Contact</Link>
         <button className="btn-primary nav-button" onClick={handleLoginClick}>Sign In</button>
         <button className="btn-secondary nav-button" onClick={handleSignupClick}>Sign Up</button>
       </nav>
