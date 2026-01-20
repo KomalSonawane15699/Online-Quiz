@@ -185,8 +185,10 @@ function Dashboard() {
   const [purchasedMegaQuizIds, setPurchasedMegaQuizIds] = useState([]);
   // Track which mega quiz to attempt
   const [megaQuizToAttempt, setMegaQuizToAttempt] = useState(null);
-  // Track coins spent on mega quizzes
+  // Track coins spent on mega quizzes (kept for reference if needed)
   const [coinsSpent, setCoinsSpent] = useState(0);
+  // Total coins available to the student - initialize from login state
+  const [totalCoins, setTotalCoins] = useState(() => location.state?.totalCoins || 0);
   // Track completed mega quizzes
   const [completedMegaQuizIds, setCompletedMegaQuizIds] = useState([]);
   // Track recent quizzes (for student, includes assigned + completed mega)
@@ -202,8 +204,8 @@ function Dashboard() {
 
   // Fetch events from API on mount (for teacher)
   useEffect(() => {
-    if (role === "teacher" && emailId && teacherId) {
-      fetch(`${API_ENDPOINTS.EVENTS}?teacherEmail=${encodeURIComponent(emailId)}}`)
+    if (role && role.toString().toLowerCase() === "teacher" && emailId && teacherId) {
+      fetch(`${API_ENDPOINTS.EVENTS}?teacherEmail=${encodeURIComponent(emailId)}`)
         .then(res => res.json())
         .then(data => {
           if (Array.isArray(data)) setEventsList(data);
@@ -214,11 +216,20 @@ function Dashboard() {
 
   // Fetch top students from API on mount (for teacher)
   useEffect(() => {
-    if (role === "teacher") {
+    console.log('Fetching top students for role:', role);
+    if (role === "TEACHER") {
       fetch(API_ENDPOINTS.TOP_STUDENTS)
         .then(res => res.json())
         .then(data => {
-          if (Array.isArray(data)) setTopStudents(data);
+          if (Array.isArray(data)) {
+            const mapped = data.map(s => ({
+              name: `${s.firstname || s.first_name || ''} ${s.lastname || s.last_name || ''}`.trim(),
+              coins: (s.coins ?? s.coins_balance ?? s.score) || 0,
+              score: (s.score ?? s.coins) || 0,
+              subject: s.subject || ''
+            }));
+            setTopStudents(mapped);
+          }
         })
         .catch(() => {
           // fallback to empty or static if error
@@ -230,8 +241,20 @@ function Dashboard() {
   // Fetch quizzes from API for teacher on mount and after publishing
   const fetchQuizzes = async () => {
     try {
-      const res = await fetch(API_ENDPOINTS.QUIZZES);
-      const data = await res.json();
+      let data = [];
+      if (role && role.toString().toLowerCase() === 'teacher' && teacherId) {
+        console.log('Fetching quizzes for teacherId (POST):', teacherId);
+        const res = await fetch(API_ENDPOINTS.QUIZZES_BY_TEACHER, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ teacherId: Number(teacherId) })
+        });
+        if (res.ok) data = await res.json();
+        else throw new Error(`Quizzes fetch failed ${res.status}`);
+      } else {
+        const res = await fetch(API_ENDPOINTS.QUIZZES);
+        data = await res.json();
+      }
       if (Array.isArray(data)) setQuizList(data);
     } catch {
       // fallback: do nothing or keep local quizzes
@@ -283,8 +306,12 @@ function Dashboard() {
     setNewEvent({ title: '', time: '', participants: '', primary: false });
   };
 
-  // Calculate total coins for student (subtract spent coins)
-  const totalCoins = studentQuizList.reduce((sum, q) => sum + (q.coins || 0), 0) - coinsSpent;
+  // Ensure totalCoins is seeded from navigation state on mount
+  useEffect(() => {
+    if (location.state && typeof location.state.totalCoins === 'number') {
+      setTotalCoins(location.state.totalCoins);
+    }
+  }, [location.state]);
 
   // Logout handler (replace with real logic as needed)
   const handleLogout = () => {
@@ -335,19 +362,24 @@ function Dashboard() {
   };
 
   const handleQuizAttemptComplete = (score, completed) => {
-    setStudentQuizList((prev) =>
-      prev.map((q) =>
-        q.title === selectedQuiz.title
-          ? {
-              ...q,
-              completed: completed,
-              coins: score,
-              timer: selectedQuiz.questions && selectedQuiz.questions[0]?.timer,
-              questions: selectedQuiz.questions ? selectedQuiz.questions.length : 1,
-            }
-          : q
-      )
-    );
+    setStudentQuizList((prev) => {
+      return prev.map((q) => {
+        if (q.title === selectedQuiz.title) {
+          const prevCoins = q.coins || 0;
+          const newCoins = score;
+          const delta = (completed ? newCoins - prevCoins : 0);
+          if (delta !== 0) setTotalCoins(tc => tc + delta);
+          return {
+            ...q,
+            completed: completed,
+            coins: newCoins,
+            timer: selectedQuiz.questions && selectedQuiz.questions[0]?.timer,
+            questions: selectedQuiz.questions ? selectedQuiz.questions.length : 1,
+          };
+        }
+        return q;
+      });
+    });
     setShowQuizAttempt(false);
     setSelectedQuiz(null);
   };
@@ -363,6 +395,8 @@ function Dashboard() {
       return;
     }
     setPurchasedMegaQuizIds(ids => [...ids, quizId]);
+    // Deduct price from totalCoins
+    setTotalCoins(prev => prev - price);
     setCoinsSpent(prev => prev + price);
     alert("Mega Quiz purchased! You can now attempt it.");
   };
@@ -377,12 +411,19 @@ function Dashboard() {
           // If already present, update as completed; else add
           const exists = prev.find(q => q.title === megaQuizObj.quiz.title);
           if (exists) {
-            return prev.map(q =>
-              q.title === megaQuizObj.quiz.title
-                ? { ...q, completed: true, coins: score, questions: megaQuizObj.quiz.questions.length }
-                : q
-            );
+            // update and adjust totalCoins by delta
+            return prev.map(q => {
+              if (q.title === megaQuizObj.quiz.title) {
+                const prevCoins = q.coins || 0;
+                const delta = completed ? (score - prevCoins) : 0;
+                if (delta !== 0) setTotalCoins(tc => tc + delta);
+                return { ...q, completed: true, coins: score, questions: megaQuizObj.quiz.questions.length };
+              }
+              return q;
+            });
           }
+          // add and credit coins to total
+          if (completed && score) setTotalCoins(tc => tc + score);
           return [
             ...prev,
             {
@@ -461,7 +502,7 @@ function Dashboard() {
     </header>
   );
 
-  if (role === "student") {
+  if (role === "STUDENT") {
     // Student view
     return (
       <div className="dashboard-root">
@@ -682,11 +723,13 @@ function Dashboard() {
             </header>
 
             {/* Quiz creation flow */}
-            {showCreateQuiz ? (
+                {showCreateQuiz ? (
               quizStep === 1 ? (
                 <CreateQuiz
                   onNext={handleNextToQuestions}
                   onCancel={() => { setShowCreateQuiz(false); setQuizStep(1); setQuizDraft(null); }}
+                  teacherEmail={emailId}
+                  teacherRole={role}
                 />
               ) : (
                 <CreateQuizQuestions

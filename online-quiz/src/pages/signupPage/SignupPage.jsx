@@ -32,10 +32,11 @@ function SignupPage({ onLoginClick, onNavigate }) {
     // Use API endpoint from config
     const apiUrl = API_ENDPOINTS.SIGNUP;
     try {
+      const payload = { ...form, role: form.role ? form.role.toUpperCase() : form.role };
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
+        body: JSON.stringify(payload)
       });
       if (response.ok) {
         setMessage('Thank you for registering!');

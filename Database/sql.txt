@@ -14,6 +14,15 @@ CREATE TABLE users (
     level INT DEFAULT 1
 );
 
+-- roles Table: canonical list of roles used by the application
+CREATE TABLE roles (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(50) UNIQUE NOT NULL
+);
+
+-- Seed roles
+INSERT INTO roles (name) VALUES ('STUDENT'), ('TEACHER');
+
 
 ⦁	quizzes Table
 

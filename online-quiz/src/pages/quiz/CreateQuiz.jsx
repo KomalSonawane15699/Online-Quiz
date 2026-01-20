@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 // import "./CreateQuiz.css"; // already imported in Dashboard
 
-function CreateQuiz({ onNext, onCancel }) {
+function CreateQuiz({ onNext, onCancel, teacherEmail, teacherRole }) {
   const [quiz, setQuiz] = useState({
     title: "",
     description: "",
@@ -28,6 +28,23 @@ function CreateQuiz({ onNext, onCancel }) {
     quiz.difficulty &&
     quiz.timeLimit > 0 &&
     quiz.passingScore > 0;
+
+  const [error, setError] = useState('');
+
+  const handleNext = () => {
+    setError('');
+    if (!isValid) return;
+    if (!teacherEmail) {
+      setError('Teacher email is required to create a quiz.');
+      return;
+    }
+    if (!teacherRole || teacherRole.toUpperCase() !== 'TEACHER') {
+      setError('Only users with role TEACHER can create quizzes.');
+      return;
+    }
+    const quizWithTeacher = { ...quiz, teacherEmail, teacherRole };
+    onNext && onNext(quizWithTeacher);
+  };
 
   return (
     <div className="create-quiz-container">
@@ -146,11 +163,12 @@ function CreateQuiz({ onNext, onCancel }) {
         </button>
         <button
           className="next-btn"
-          onClick={() => onNext && onNext(quiz)}
+          onClick={handleNext}
           disabled={!isValid}
         >
           Next
         </button>
+        {error && <div className="error-message" style={{ color: 'red', marginTop: 8 }}>{error}</div>}
       </div>
     </div>
   );

@@ -69,25 +69,14 @@ function CreateQuizQuestions({ quiz, onPrev, onPublish }) {
 
   // New handler for publishing quiz to API
   const handlePublish = async () => {
+    // Delegate actual POST to parent `onPublish` handler (Dashboard).
     if (!onPublish) return;
     setPublishing(true);
     try {
-      const response = await fetch(API_ENDPOINTS.QUIZZES, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...quiz, questions }),
-      });
-      if (response.ok) {
-        const savedQuiz = await response.json();
-        onPublish(savedQuiz); // Pass saved quiz to parent
-      } else {
-        // fallback: pass local quiz if API fails
-        onPublish({ ...quiz, questions });
-      }
-    } catch {
       onPublish({ ...quiz, questions });
+    } finally {
+      setPublishing(false);
     }
-    setPublishing(false);
   };
 
   return (

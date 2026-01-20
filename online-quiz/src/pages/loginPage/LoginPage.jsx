@@ -26,24 +26,40 @@ function LoginPage({ onSignupClick, onNavigate }) {
     // Use API endpoint from config
     const apiUrl = API_ENDPOINTS.LOGIN;
     try {
+      const payload = { ...form, role: form.role ? form.role.toUpperCase() : form.role };
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form) // form includes role (student/teacher)
+        body: JSON.stringify(payload)
       });
       if (response.ok) {
-        // Pass name, emailId, and role to dashboard via navigation state
-        navigate('/dashboard', { 
-          state: { 
-            name: 'Komal', // You can update this if you fetch/display the user's name after login
-            emailId: form.email,
-            role: form.role 
-          } 
-        });
+        const data = await response.json().catch(() => ({}));
+        const hasData = (Array.isArray(data) && data.length > 0) || (!Array.isArray(data) && data && Object.keys(data).length > 0);
+        if (hasData) {
+          const entry = Array.isArray(data) ? data[0] : data;
+                const name = entry.firstname || entry.name || '';
+                const email = entry.email || form.email;
+                const roleValue = (entry.role || form.role || '').toString();
+                const role = roleValue ? roleValue.toUpperCase() : '';
+                const totalCoins = entry.coins || entry.totalCoins || entry.coins_balance || 0;
+                const teacherId = entry.id || entry.userId || entry.teacherId || null;
+            console.log('Login successful for:', name, email, role, 'teacherId=', teacherId);
+            navigate('/dashboard', {
+              state: {
+                name,
+                emailId: email,
+                role,
+                totalCoins,
+                teacherId
+              }
+            });
+        } else {
+          setError('Invalid credentials or role. Please try again.');
+        }
       } else {
         setError('Invalid credentials or role. Please try again.');
       }
-    } catch {
+    } catch (err) {
       setError('Network error. Please try again.');
     }
   };
