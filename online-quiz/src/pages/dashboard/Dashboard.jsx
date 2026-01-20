@@ -175,7 +175,7 @@ function Dashboard() {
   const teacherId = location.state?.teacherId || ""; // <-- Add this line if not present
   const username = name;
   const [showCreateQuiz, setShowCreateQuiz] = useState(false);
-  const [quizList, setQuizList] = useState(quizzes);
+  const [quizList, setQuizList] = useState([]);
   const [quizStep, setQuizStep] = useState(1);
   const [quizDraft, setQuizDraft] = useState(null);
   const [showQuizAttempt, setShowQuizAttempt] = useState(false);
@@ -242,18 +242,17 @@ function Dashboard() {
   const fetchQuizzes = async () => {
     try {
       let data = [];
+      console.log(teacherId)
+      console.log(role);
       if (role && role.toString().toLowerCase() === 'teacher' && teacherId) {
-        console.log('Fetching quizzes for teacherId (POST):', teacherId);
-        const res = await fetch(API_ENDPOINTS.QUIZZES_BY_TEACHER, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ teacherId: Number(teacherId) })
+        console.log('Fetching quizzes for teacherId (GET):', teacherId);
+        const url = `${API_ENDPOINTS.QUIZZES_BY_TEACHER}?teacherId=${encodeURIComponent(teacherId)}`;
+        const res = await fetch(url, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
         });
         if (res.ok) data = await res.json();
         else throw new Error(`Quizzes fetch failed ${res.status}`);
-      } else {
-        const res = await fetch(API_ENDPOINTS.QUIZZES);
-        data = await res.json();
       }
       if (Array.isArray(data)) setQuizList(data);
     } catch {
@@ -262,10 +261,10 @@ function Dashboard() {
   };
 
   useEffect(() => {
-    if (role === "teacher") {
+    if (role === "TEACHER" && teacherId) {
       fetchQuizzes();
     }
-  }, [role]);
+  }, [role, teacherId]);
 
   // Update event input handler for new fields
   const handleEventInputChange = (e) => {
@@ -826,27 +825,43 @@ function Dashboard() {
                     <h2>Recent Quizzes</h2>
                   </header>
                   <div className="quiz-grid">
-                    {quizList.map((quiz, idx) => (
-                      <article key={idx} className="quiz-card">
-                        <div className="quiz-header">
-                          <h3>{quiz.title}</h3>
-                          <span className="quiz-arrow">›</span>
-                        </div>
-                        <p className="quiz-meta">
-                          {quiz.questions} questions • {quiz.completions} completions
-                        </p>
-                        <div className="progress-row">
-                          <span>Completion Rate</span>
-                          <span>{quiz.completionRate}%</span>
-                        </div>
-                        <div className="progress-bar">
-                          <div
-                            className="progress-fill"
-                            style={{ width: `${quiz.completionRate}%` }}
-                          />
-                        </div>
-                      </article>
-                    ))}
+
+                    {quizList.map((quiz, idx) => {
+                      // Calculate coins if quiz.questions is an array of question objects
+                      let coins = 0;
+                      if (Array.isArray(quiz.questions)) {
+                        coins = quiz.questions.reduce((sum, q) => sum + (q.points || 0), 0);
+                      } else if (typeof quiz.totalPoints === 'number') {
+                        coins = quiz.totalPoints;
+                      }
+                      let numQuestions;
+                      if (Array.isArray(quiz.questions)) {
+                        numQuestions = quiz.questions.length;
+                      } else if (typeof quiz.questions === 'number') {
+                        numQuestions = quiz.questions;
+                      } else if (typeof quiz.totalPoints === 'number') {
+                        numQuestions = Math.round(quiz.totalPoints / 10);
+                      } else {
+                        numQuestions = '--';
+                      }
+                      // If quiz has a timer, show it, else '--'
+                      const time = quiz.timeLimit ? `${quiz.timeLimit}min` : '--';
+                      return (
+                        <article key={idx} className="quiz-card">
+                          <div className="quiz-header">
+                            <h3>{quiz.title}</h3>
+                            <span className="quiz-arrow">›</span>
+                          </div>
+                          <p className="quiz-meta">
+                            <strong>Coins:</strong> <span style={{ color: '#FFD700', fontWeight: 600 }}><img src="https://cdn-icons-png.flaticon.com/512/616/616490.png" alt="coin" style={{ width: '18px', verticalAlign: 'middle', marginRight: '4px' }} />{coins}</span> &nbsp;|&nbsp; <strong>Questions:</strong> {numQuestions}
+                          </p>
+                          <div className="progress-row">
+                            <span>Time</span>
+                            <span>{time}</span>
+                          </div>
+                        </article>
+                      );
+                    })}
 
                     <article className="quiz-card quiz-create">
                       <button className="btn-circle" onClick={() => { setShowCreateQuiz(true); setQuizStep(1); }}>+</button>
