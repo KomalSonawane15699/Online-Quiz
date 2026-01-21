@@ -27,24 +27,8 @@ const quizzes = [
 ];
 
 // Example data for student quizzes and top students this week
-const studentQuizzes = [
-  { title: "Math Basics", assignedBy: "Mr. Smith", coins: 50, completed: true },
-  { title: "Science Quiz", assignedBy: "Ms. Green", coins: 30, completed: false },
-  { title: "English Grammar", assignedBy: "Mrs. Brown", coins: 40, completed: true },
-];
 
-const topStudentsWeek = [
-  { name: "Emma Watson", coins: 120 },
-  { name: "Alex John", coins: 110 },
-  { name: "Sophia Green", coins: 105 },
-  { name: "Michael Clark", coins: 100 },
-  { name: "Lucia Wilde", coins: 98 },
-  { name: "John Doe", coins: 95 },
-  { name: "Jane Smith", coins: 92 },
-  { name: "Chris Evans", coins: 90 },
-  { name: "Olivia Lee", coins: 88 },
-  { name: "Liam Brown", coins: 85 },
-];
+
 
 // Add a placeholder for the quiz attempt screen
 function QuizAttemptScreen({ quiz, onClose }) {
@@ -172,7 +156,7 @@ function Dashboard() {
   // Use name and emailId from navigation state if available, fallback to defaults
   const name = location.state?.name;
   const emailId = location.state?.emailId || "";
-  const teacherId = location.state?.teacherId || ""; // <-- Add this line if not present
+  const teacherId = location.state?.Id || ""; // <-- Add this line if not present
   const username = name;
   const [showCreateQuiz, setShowCreateQuiz] = useState(false);
   const [quizList, setQuizList] = useState([]);
@@ -180,7 +164,7 @@ function Dashboard() {
   const [quizDraft, setQuizDraft] = useState(null);
   const [showQuizAttempt, setShowQuizAttempt] = useState(false);
   const [selectedQuiz, setSelectedQuiz] = useState(null);
-  const [studentQuizList, setStudentQuizList] = useState(studentQuizzes);
+  const [studentQuizList, setStudentQuizList] = useState([]);
   // Track purchased mega quizzes by id
   const [purchasedMegaQuizIds, setPurchasedMegaQuizIds] = useState([]);
   // Track which mega quiz to attempt
@@ -192,7 +176,25 @@ function Dashboard() {
   // Track completed mega quizzes
   const [completedMegaQuizIds, setCompletedMegaQuizIds] = useState([]);
   // Track recent quizzes (for student, includes assigned + completed mega)
-  const [recentStudentQuizzes, setRecentStudentQuizzes] = useState([...studentQuizzes]);
+  const [recentStudentQuizzes, setRecentStudentQuizzes] = useState([]);
+    // Fetch assigned quizzes for student from API
+    useEffect(() => {
+      const studentId = location.state?.Id;
+      if (role === "STUDENT" && studentId) {
+        fetch(`${API_ENDPOINTS.QUIZZES}/assigned?studentId=${encodeURIComponent(studentId)}`)
+          .then(res => res.json())
+          .then(data => {
+            if (Array.isArray(data)) {
+              setStudentQuizList(data);
+              setRecentStudentQuizzes(data);
+            }
+          })
+          .catch(() => {
+            setStudentQuizList([]);
+            setRecentStudentQuizzes([]);
+          });
+      }
+    }, [role, location.state]);
   const [eventsList, setEventsList] = useState([
     { title: "Mid-term Quiz", time: "Today, 2:30 PM", participants: 32, primary: true },
     { title: "Weekly Test", time: "Tomorrow, 10:00 AM", participants: 28, primary: false },
@@ -214,29 +216,26 @@ function Dashboard() {
     }
   }, [role, emailId, teacherId]);
 
-  // Fetch top students from API on mount (for teacher)
+  // Fetch top students from API on mount (for both student and teacher)
   useEffect(() => {
-    console.log('Fetching top students for role:', role);
-    if (role === "TEACHER") {
-      fetch(API_ENDPOINTS.TOP_STUDENTS)
-        .then(res => res.json())
-        .then(data => {
-          if (Array.isArray(data)) {
-            const mapped = data.map(s => ({
-              name: `${s.firstname || s.first_name || ''} ${s.lastname || s.last_name || ''}`.trim(),
-              coins: (s.coins ?? s.coins_balance ?? s.score) || 0,
-              score: (s.score ?? s.coins) || 0,
-              subject: s.subject || ''
-            }));
-            setTopStudents(mapped);
-          }
-        })
-        .catch(() => {
-          // fallback to empty or static if error
-          setTopStudents([]);
-        });
-    }
-  }, [role]);
+    fetch(API_ENDPOINTS.TOP_STUDENTS)
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          const mapped = data.map(s => ({
+            name: `${s.firstname || s.first_name || ''} ${s.lastname || s.last_name || ''}`.trim(),
+            coins: (s.coins ?? s.coins_balance ?? s.score) || 0,
+            score: (s.score ?? s.coins) || 0,
+            subject: s.subject || ''
+          }));
+          setTopStudents(mapped);
+        }
+      })
+      .catch(() => {
+        // fallback to empty or static if error
+        setTopStudents([]);
+      });
+  }, []);
 
   // Fetch quizzes from API for teacher on mount and after publishing
   const fetchQuizzes = async () => {
@@ -652,8 +651,8 @@ function Dashboard() {
                           </span>
                         </div>
                         <div className="progress-row">
-                          <span>Time: {quiz.timer ? `${quiz.timer}s` : "--"}</span>
-                          <span>Questions: {quiz.questions || (quiz.questions === 0 ? 0 : "--")}</span>
+                          <span>Time: {quiz.timeLimit ? `${quiz.timeLimit}mins` : "--"}</span>
+                          <span>Questions: {quiz.questionsCount || (quiz.questionsCount === 0 ? 0 : "--")}</span>
                         </div>
                       </article>
                     ))
@@ -664,13 +663,13 @@ function Dashboard() {
             <aside className="dashboard-sidebar">
               <section className="panel">
                 <header className="panel-header">
-                  <h2>Top 10 Students This Week</h2>
+                  <h2>Top 10 Students</h2>
                   <p className="panel-subtitle">
                     Based on coins earned
                   </p>
                 </header>
                 <ol className="student-list">
-                  {topStudentsWeek.map((student, index) => (
+                  {topStudents.slice(0, 10).map((student, index) => (
                     <li key={student.name} className="student-item">
                       <span className="student-rank">{index + 1}</span>
                       <div className="student-info">

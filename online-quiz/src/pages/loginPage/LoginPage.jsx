@@ -42,15 +42,15 @@ function LoginPage({ onSignupClick, onNavigate }) {
                 const roleValue = (entry.role || form.role || '').toString();
                 const role = roleValue ? roleValue.toUpperCase() : '';
                 const totalCoins = entry.coins || entry.totalCoins || entry.coins_balance || 0;
-                const teacherId = entry.id || entry.userId || entry.teacherId || null;
-            console.log('Login successful for:', name, email, role, 'teacherId=', teacherId);
+                const Id = entry.id || entry.userId || entry.teacherId || null;
+            console.log('Login successful for:', name, email, role, 'teacherId=',Id);
             navigate('/dashboard', {
               state: {
                 name,
                 emailId: email,
                 role,
                 totalCoins,
-                teacherId
+                Id
               }
             });
         } else {
