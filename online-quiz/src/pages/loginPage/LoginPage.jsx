@@ -44,14 +44,11 @@ function LoginPage({ onSignupClick, onNavigate }) {
                 const totalCoins = entry.coins || entry.totalCoins || entry.coins_balance || 0;
                 const Id = entry.id || entry.userId || entry.teacherId || null;
             console.log('Login successful for:', name, email, role, 'teacherId=',Id);
+            // Store dashboard state in localStorage for persistence
+            const dashboardState = { name, emailId: email, role, totalCoins, Id };
+            localStorage.setItem('dashboardState', JSON.stringify(dashboardState));
             navigate('/dashboard', {
-              state: {
-                name,
-                emailId: email,
-                role,
-                totalCoins,
-                Id
-              }
+              state: dashboardState
             });
         } else {
           setError('Invalid credentials or role. Please try again.');

@@ -90,6 +90,10 @@ function CreateQuiz({ onNext, onCancel, teacherEmail, teacherRole }) {
                 <option value="">Select</option>
                 <option value="Science">Science</option>
                 <option value="Math">Math</option>
+                <option value="History">History</option>
+                <option value="Geography">Geography</option>
+                <option value="Literature">Literature</option>
+                <option value="Sports">Sports</option>
                 {/* Add more categories as needed */}
               </select>
             </div>
@@ -104,6 +108,7 @@ function CreateQuiz({ onNext, onCancel, teacherEmail, teacherRole }) {
                 <option value="Easy">Easy</option>
                 <option value="Medium">Medium</option>
                 <option value="Hard">Hard</option>
+                <option value="Expert">Expert</option>
               </select>
             </div>
           </div>

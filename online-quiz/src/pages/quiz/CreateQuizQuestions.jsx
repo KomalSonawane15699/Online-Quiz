@@ -35,8 +35,9 @@ function CreateQuizQuestions({ quiz, onPrev, onPublish }) {
     setQuestions(updated);
   };
 
+  // Ensure new questions get their own unique options array (not a reference)
   const addQuestion = () => {
-    setQuestions([...questions, { ...defaultQuestion }]);
+    setQuestions([...questions, { ...defaultQuestion, options: ["", ""] }]);
   };
 
   const removeQuestion = (idx) => {

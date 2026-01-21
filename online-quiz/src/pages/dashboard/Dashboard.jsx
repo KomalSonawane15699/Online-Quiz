@@ -150,13 +150,40 @@ const megaQuizzes = [
   }
 ];
 
+// Add this function after your imports and before Dashboard component
+const fetchStudentCoins = async (Id, setTotalCoins) => {
+  if (!Id) return;
+  try {
+    const res = await fetch(`${API_ENDPOINTS.COINS}?id=${encodeURIComponent(Id)}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (typeof data.coins === "number") {
+        setTotalCoins(data.coins);
+      }
+    }
+  } catch {
+    // Optionally handle error
+  }
+};
+
 function Dashboard() {
   const location = useLocation();
-  const role = location.state?.role || "teacher";
-  // Use name and emailId from navigation state if available, fallback to defaults
-  const name = location.state?.name;
-  const emailId = location.state?.emailId || "";
-  const teacherId = location.state?.Id || ""; // <-- Add this line if not present
+
+  // --- Add this block to support state persistence from localStorage ---
+  let dashboardState = location.state;
+  if (!dashboardState) {
+    try {
+      const stored = localStorage.getItem('dashboardState');
+      if (stored) dashboardState = JSON.parse(stored);
+    } catch {}
+  }
+  // ---------------------------------------------------------------------
+
+  const role = dashboardState?.role || "teacher";
+  const name = dashboardState?.name;
+  const emailId = dashboardState?.emailId || "";
+  const teacherId = dashboardState?.Id || "";
+  const Id = dashboardState?.Id || "";
   const username = name;
   const [showCreateQuiz, setShowCreateQuiz] = useState(false);
   const [quizList, setQuizList] = useState([]);
@@ -172,7 +199,7 @@ function Dashboard() {
   // Track coins spent on mega quizzes (kept for reference if needed)
   const [coinsSpent, setCoinsSpent] = useState(0);
   // Total coins available to the student - initialize from login state
-  const [totalCoins, setTotalCoins] = useState(() => location.state?.totalCoins || 0);
+  const [totalCoins, setTotalCoins] = useState(() => dashboardState?.totalCoins || 0);
   // Track completed mega quizzes
   const [completedMegaQuizIds, setCompletedMegaQuizIds] = useState([]);
   // Track recent quizzes (for student, includes assigned + completed mega)
@@ -215,6 +242,12 @@ function Dashboard() {
         .catch(() => { /* fallback to local if error */ });
     }
   }, [role, emailId, teacherId]);
+
+  useEffect(() => {
+  if (role === "STUDENT" && Id) {
+    fetchStudentCoins(Id, setTotalCoins);
+  }
+}, [role, Id]);
 
   // Fetch top students from API on mount (for both student and teacher)
   useEffect(() => {
@@ -304,12 +337,12 @@ function Dashboard() {
     setNewEvent({ title: '', time: '', participants: '', primary: false });
   };
 
-  // Ensure totalCoins is seeded from navigation state on mount
+  // Ensure totalCoins is seeded from navigation state or localStorage on mount
   useEffect(() => {
-    if (location.state && typeof location.state.totalCoins === 'number') {
-      setTotalCoins(location.state.totalCoins);
+    if (dashboardState && typeof dashboardState.totalCoins === 'number') {
+      setTotalCoins(dashboardState.totalCoins);
     }
-  }, [location.state]);
+  }, [dashboardState]);
 
   // Logout handler (replace with real logic as needed)
   const handleLogout = () => {
@@ -359,6 +392,25 @@ function Dashboard() {
     setQuizStep(1);
   };
 
+  // Fetch top students function (extract for reuse)
+const fetchTopStudents = async () => {
+  try {
+    const res = await fetch(API_ENDPOINTS.TOP_STUDENTS);
+    const data = await res.json();
+    if (Array.isArray(data)) {
+      const mapped = data.map(s => ({
+        name: `${s.firstname || s.first_name || ''} ${s.lastname || s.last_name || ''}`.trim(),
+        coins: (s.coins ?? s.coins_balance ?? s.score) || 0,
+        score: (s.score ?? s.coins) || 0,
+        subject: s.subject || ''
+      }));
+      setTopStudents(mapped);
+    }
+  } catch {
+    setTopStudents([]);
+  }
+};
+
   const handleQuizAttemptComplete = (score, completed) => {
     setStudentQuizList((prev) => {
       return prev.map((q) => {
@@ -380,6 +432,8 @@ function Dashboard() {
     });
     setShowQuizAttempt(false);
     setSelectedQuiz(null);
+    // Refresh top students after quiz completion
+    fetchTopStudents();
   };
 
   // Buy logic for Mega Quiz
@@ -640,10 +694,16 @@ function Dashboard() {
                                   cursor: "pointer"
                                 }}
                                 onClick={() => {
-                                  setSelectedQuiz(quiz);
+                                  setSelectedQuiz({
+                                    ...quiz,
+                                    studentId: location.state?.Id,
+                                    quizId: quiz.id || quiz.quizId || quiz._id // support various id fields
+                                  });
                                   setShowQuizAttempt(true);
                                 }}
                                 type="button"
+                                // Hide button if completed
+                                disabled={quiz.completed}
                               >
                                 Attempt Quiz
                               </button>
@@ -687,6 +747,8 @@ function Dashboard() {
             {showQuizAttempt && selectedQuiz && (
               <AttemptQuiz
                 quiz={selectedQuiz}
+                studentId={selectedQuiz.studentId}
+                quizId={selectedQuiz.quizId}
                 onClose={() => {
                   setShowQuizAttempt(false);
                   setSelectedQuiz(null);
